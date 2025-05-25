@@ -1,10 +1,19 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { prismaClient } from "..";
 import { compareSync, hashSync } from "bcryptjs";
 import * as jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../secrets";
+import { BadRequestsException } from "../exceptions/bad-requests";
+import { ErrorCode } from "../exceptions/root";
+import { UnprocessableEntity } from "../exceptions/validation";
+import { SignUpSchema } from "../schema/users";
 
-export const signup = async (req: Request, res: Response) => {
+export const signup = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  SignUpSchema.parse(req.body);
   const { email, password, name } = req.body;
 
   const existUser = await prismaClient.user.findFirst({
@@ -12,7 +21,12 @@ export const signup = async (req: Request, res: Response) => {
   });
 
   if (existUser) {
-    throw Error("User already exists");
+    next(
+      new BadRequestsException(
+        "User already exists",
+        ErrorCode.USER_ALREADY_EXISTS
+      )
+    );
   }
 
   const hashedPassword = hashSync(password, 10);
@@ -32,7 +46,11 @@ export const signup = async (req: Request, res: Response) => {
   });
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { email, password } = req.body;
 
   const existingUser = await prismaClient.user.findFirst({
@@ -59,11 +77,11 @@ export const login = async (req: Request, res: Response) => {
   const user = await prismaClient.user.findUnique({
     where: { email },
     select: {
-       id: true,
-       name: true,
-       email: true,
-       createdAt: true,
-       updatedAt: true,
+      id: true,
+      name: true,
+      email: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 
