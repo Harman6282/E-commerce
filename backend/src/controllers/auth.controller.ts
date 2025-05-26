@@ -7,6 +7,7 @@ import { BadRequestsException } from "../exceptions/bad-requests";
 import { ErrorCode } from "../exceptions/root";
 import { UnprocessableEntity } from "../exceptions/validation";
 import { SignUpSchema } from "../schema/users";
+import { NotfoundException } from "../exceptions/not-found";
 
 export const signup = async (
   req: Request,
@@ -21,11 +22,9 @@ export const signup = async (
   });
 
   if (existUser) {
-    next(
-      new BadRequestsException(
-        "User already exists",
-        ErrorCode.USER_ALREADY_EXISTS
-      )
+    new BadRequestsException(
+      "User already exists",
+      ErrorCode.USER_ALREADY_EXISTS
     );
   }
 
@@ -58,13 +57,13 @@ export const login = async (
   });
 
   if (!existingUser) {
-    throw Error("User not found");
+     throw new NotfoundException("user not found", ErrorCode.USER_NOT_FOUND)
   }
 
   const isValidPasssword = compareSync(password, existingUser.password);
 
   if (!isValidPasssword) {
-    throw Error("Invalid password");
+    throw new NotfoundException("Invalid password", ErrorCode.INVALID_PASSWORD)
   }
 
   const token = jwt.sign(
