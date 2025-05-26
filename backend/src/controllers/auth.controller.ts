@@ -91,3 +91,7 @@ export const login = async (
     token,
   });
 };
+
+export const me = async (req: Request, res: Response) => {
+ res.json((req as any).user)
+}
