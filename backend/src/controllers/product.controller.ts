@@ -87,8 +87,3 @@ export const getProductById = async (req: Request, res: Response) => {
     );
   }
 };
-
-
-// export const  = async (req: Request, res: Response) => {
-  
-// };
