@@ -20,9 +20,12 @@ model User {
   email String @unique
   password String
   role Role @default(USER)
+  defaultShippingAddress Int?
+  defaultBillingAddress Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  addresses Address[]
   @@map("users")
 }
 
@@ -36,4 +39,20 @@ model Product {
   updatedAt DateTime @updatedAt
 
   @@map("products")
+}
+
+model Address {
+  id String @id @default(uuid())
+  lineOne String
+  lineTwo String?
+  city String
+  pincode String
+  country String
+  userId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("addresses")
 }
