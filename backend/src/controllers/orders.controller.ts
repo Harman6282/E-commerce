@@ -142,14 +142,14 @@ export const changeStatus = async (req: Request, res: Response) => {
   }
 };
 export const listUserOrders = async (req: Request, res: Response) => {
-     let whereClause: any = {
-        userId: req.params.id
-     };
+  let whereClause: any = {
+    userId: req.params.id,
+  };
 
   const status = req.query.status;
   if (status) {
     whereClause = {
-        ...whereClause,
+      ...whereClause,
       status,
     };
   }
